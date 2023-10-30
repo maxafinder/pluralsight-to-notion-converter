@@ -8,7 +8,7 @@ notion_key = os.environ['NOTION_KEY']
 notion_page_id = os.environ['NOTION_PAGE_ID']
 
 # Send a request to the Notion API
-def sendNotionRequest(endpoint, payload_data):
+def send_notion_request(endpoint, payload_data):
 	headers = {
 			'Authorization': f'Bearer {notion_key}',
 			'Content-Type': 'application/json',
@@ -18,7 +18,7 @@ def sendNotionRequest(endpoint, payload_data):
 	return response
 
 # Create a new Notion page
-def createPage(title):
+def create_page(title):
 	payload_data = {
 			'parent': { 'page_id': notion_page_id },
 			'properties': {
@@ -33,7 +33,7 @@ def createPage(title):
 				}
 			}
 	}
-	response = sendNotionRequest('pages', payload_data)
+	response = send_notion_request('pages', payload_data)
 	if response.status_code == 200:
 		print('Page created successfully:', response.json())
 		return response
@@ -42,7 +42,7 @@ def createPage(title):
 		return None
 
 # Create a toggle header 3
-def createToggleHeader3(title, new_page_id):
+def create_toggle_header3(title, new_page_id):
 	payload_data = {
-		
+
 	}

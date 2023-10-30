@@ -1,20 +1,22 @@
+import csv
 import notion_functions as notion
-
-# Get the path name to CSV file from the user
-def getPathToCSV():
-	print('Enter path to the Pluralsight .csv file: ')
-	# TODO: get the path 
-	file_path = ''
-	return file_path
+from models import Courses, Course, Module, Clip, Note
 
 # Parse the data in the CSV file into a dictionary 
-def parsePluralsightCSV():
-	print()
+def parse_pluralsight_csv(file_path):
+	csvfile = open(file_path, 'r')
+	csvreader = csv.reader(csvfile)
+	next(csvreader)
+
+	courses = Courses()
+	for row in csvreader:
+		courses.add_new_note(note_text=row[0], course_title=row[1], module_name=row[2], clip_name=row[3], clip_time=row[4], clip_url=row[5])
+	print(courses)
 
 # Convert the data into a Notion page
-def convertToNotion():
+def convert_to_notion(pluralsight_data):
 	# Create new page
-	page_response = notion.createPage('My New Page')
+	page_response = notion.create_page('My New Page')
 	if page_response == None:
 		return
 	page_response_data = page_response.json()	
@@ -22,10 +24,11 @@ def convertToNotion():
 
 	# TODO: Create new toggle header 3 for each module name
 
+
 def main():
-	file_path = getPathToCSV()
-	data = parsePluralsightCSV()
-	convertToNotion()
+	file_path = str(input('Enter full path name to Pluralsight notes (.csv): '))
+	pluralsight_data = parse_pluralsight_csv(file_path)
+	#convert_to_notion(pluralsight_data)
 
 if __name__ == "__main__":
 	main()
