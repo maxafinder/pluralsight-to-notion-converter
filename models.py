@@ -1,14 +1,24 @@
 from typing import List
+from text import Text, InlineCode
 
 class Note:
 	def __init__(self, time, url, text):
 		self.time = time
 		self.url = url
 		self.text = text
-	
-	def __repr__(self):
-		return f'<{self.time}> {self.text[:24]}'
 
+	def get_notion_api_format(self):
+		return {
+			'object': 'block',
+			'type': 'paragraph',
+			'paragraph': {
+				'rich_text': [
+					Text('This some text with some ').format_req(),
+					InlineCode('code').format_req(),
+					Text(' in it.').format_req()
+				]
+			}
+		}
 
 
 class Clip:
@@ -18,10 +28,22 @@ class Clip:
 	
 	def add_note(self, note):
 		self.notes.append(note)
-		
-	def __repr__(self):
-		return f'\n    {self.name}: {self.notes}\n    '
 
+	def get_notion_api_format(self):
+		return {
+			'object': 'block',
+			'type': 'heading_3',
+			'heading_3': {
+				'rich_text': [{
+					'type': 'text',
+					'text': {
+						'content': self.name
+					}
+				}],
+				'color': 'default',
+			}
+		}
+		
 
 
 class Module:
@@ -38,8 +60,27 @@ class Module:
 				return clip
 		return None
 
-	def __repr__(self):
-		return f'\n  {self.name}: {self.clips}\n  '
+	def get_notion_api_format(self):
+		clip_notes_notion_api_formatted = []
+		for clip in self.clips:
+			clip_notes_notion_api_formatted.append(clip.get_notion_api_format())
+			for note in clip.notes:
+				clip_notes_notion_api_formatted.append(note.get_notion_api_format())
+		return {
+			'object': 'block',
+			'type': 'heading_3',
+			'heading_3': {
+				'rich_text': [{
+					'type': 'text',
+					'text': {
+						'content': self.name
+					}
+				}],
+				'color': 'default',
+				'is_toggleable': True,
+				'children': clip_notes_notion_api_formatted
+			}
+		}
 
 
 
@@ -51,19 +92,35 @@ class Course:
 	def add_module(self, module):
 		self.modules.append(module)
 
-
 	def get_module(self, name):
 		for module in self.modules:
 			if module.name == name:
 				return module
 		return None
 
-	def __repr__(self):
-		return f'\n{self.title}: {self.modules}\n'
+	def get_notion_api_format(self, notion_page_id):
+		modules_notion_api_formatted = []
+		for module in self.modules:
+			modules_notion_api_formatted.append(module.get_notion_api_format())
+		return {
+			'parent': { 'page_id': notion_page_id },
+			'properties': {
+				'title': {
+					'title': [
+						{
+							'text': {
+								'content': self.title
+							}
+						}
+					]
+				}
+			},
+			'children': modules_notion_api_formatted
+		}
 
 
 
-class Courses:
+class PluralsightData:
 	def __init__(self):
 		self.courses: List[Course] = []
 
@@ -91,6 +148,3 @@ class Courses:
 			module.add_clip(clip)
 		new_note = Note(clip_time, clip_url, note_text)
 		clip.add_note(new_note)
-
-	def __repr__(self):
-		return f'Courses: \n{self.courses}'
