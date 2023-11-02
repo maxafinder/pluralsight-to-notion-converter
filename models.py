@@ -1,22 +1,23 @@
 from typing import List
-from text import Text, InlineCode
+from text import Text, InlineCode, parse_text 
+
 
 class Note:
 	def __init__(self, time, url, text):
 		self.time = time
 		self.url = url
-		self.text = text
+		self.content = parse_text(text)
 
 	def get_notion_api_format(self):
+		content_notion_api_formatted = []
+		for part in self.content:
+			content_notion_api_formatted.append(part.format_req())
+
 		return {
 			'object': 'block',
 			'type': 'paragraph',
 			'paragraph': {
-				'rich_text': [
-					Text('This some text with some ').format_req(),
-					InlineCode('code').format_req(),
-					Text(' in it.').format_req()
-				]
+				'rich_text': content_notion_api_formatted
 			}
 		}
 
@@ -44,7 +45,6 @@ class Clip:
 			}
 		}
 		
-
 
 class Module:
 	def __init__(self, name):
@@ -83,7 +83,6 @@ class Module:
 		}
 
 
-
 class Course:
 	def __init__(self, title):
 		self.title = title
@@ -117,7 +116,6 @@ class Course:
 			},
 			'children': modules_notion_api_formatted
 		}
-
 
 
 class PluralsightData:

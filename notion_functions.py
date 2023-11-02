@@ -1,8 +1,6 @@
 import os
 import dotenv
 import requests
-from requests import Response
-import re
 from models import Course
 
 # Load environment variables
@@ -11,7 +9,6 @@ notion_key = os.environ['NOTION_KEY']
 notion_page_id = os.environ['NOTION_PAGE_ID']
 
 	
-
 # Send a request to the Notion API
 def send_notion_request(endpoint, payload_data):
 	headers = {
@@ -21,7 +18,6 @@ def send_notion_request(endpoint, payload_data):
 	}
 	response = requests.post(f'https://api.notion.com/v1/{endpoint}', headers=headers, json=payload_data)
 	return response
-
 
 
 # Create a new Notion page
