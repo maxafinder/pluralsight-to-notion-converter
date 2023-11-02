@@ -1,26 +1,37 @@
 from typing import List
-from text import Text, InlineCode, parse_text 
+from text import parse_text, CodeBlock 
+import copy
 
 
 class Note:
 	def __init__(self, time, url, text):
 		self.time = time
 		self.url = url
-		self.content = parse_text(text)
+		self.note = parse_text(text)
 
-	def get_notion_api_format(self):
-		content_notion_api_formatted = []
-		for part in self.content:
-			content_notion_api_formatted.append(part.format_req())
-
+	def __format_text_parts(self, parts_api_formatted):
 		return {
 			'object': 'block',
 			'type': 'paragraph',
 			'paragraph': {
-				'rich_text': content_notion_api_formatted
+				'rich_text': parts_api_formatted
 			}
 		}
 
+	def get_notion_api_format(self):
+		note_notion_api_formatted = []
+		next_part = []
+		for part in self.note:
+			if part.__class__ == CodeBlock:
+				if next_part:
+					note_notion_api_formatted.append(self.__format_text_parts(copy.copy(next_part)))
+					next_part.clear()
+				note_notion_api_formatted.append(part.format_req())
+			else:
+				next_part.append(part.format_req())
+		if next_part:
+			note_notion_api_formatted.append(self.__format_text_parts(copy.copy(next_part)))
+		return note_notion_api_formatted
 
 class Clip:
 	def __init__(self, name):
@@ -65,7 +76,7 @@ class Module:
 		for clip in self.clips:
 			clip_notes_notion_api_formatted.append(clip.get_notion_api_format())
 			for note in clip.notes:
-				clip_notes_notion_api_formatted.append(note.get_notion_api_format())
+				clip_notes_notion_api_formatted.extend(note.get_notion_api_format())
 		return {
 			'object': 'block',
 			'type': 'heading_3',

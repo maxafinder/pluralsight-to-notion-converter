@@ -8,7 +8,7 @@ class ContentType(ABC):
 		pass
 
 class Text(ContentType):
-	def __init__(self, text):
+	def __init__(self, text: str):
 		self.text = text
 
 	def format_req(self):
@@ -21,7 +21,7 @@ class Text(ContentType):
 
 
 class InlineCode(ContentType):
-	def __init__(self, text):
+	def __init__(self, text: str):
 		self.text = text
 
 	def format_req(self):
@@ -37,8 +37,8 @@ class InlineCode(ContentType):
 
 
 class CodeBlock(ContentType):
-	def __init__(self, text):
-		self.text = text
+	def __init__(self, text: str):
+		self.text = text.strip('\n')
 	
 	def format_req(self):
 		return {
@@ -75,14 +75,13 @@ class NumberedList(ContentType):
 def parse_text(text) -> List[ContentType]:
 	parts = []
 	text_part = ''
-	#for i in range(0, len(text)):
 	i = 0
 	while i < len(text):
 		if (code_block_part := is_code_block(text[i:])):
 			if text_part != '':
 				parts.append(Text(text_part))
 				text_part = ''
-			#parts.append(CodeBlock(code_block_part))
+			parts.append(CodeBlock(code_block_part))
 			i += len(code_block_part) + 6
 		elif (inline_code_part := is_inline_code(text[i:])):
 			if text_part != '':
