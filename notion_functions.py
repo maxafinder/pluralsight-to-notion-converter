@@ -3,6 +3,7 @@ import dotenv
 import requests
 from models import Course
 
+
 # Load environment variables
 dotenv.load_dotenv()
 notion_key = os.environ['NOTION_KEY']

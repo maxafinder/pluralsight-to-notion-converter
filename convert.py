@@ -1,11 +1,9 @@
-from typing import List
 import csv
 import notion_functions as notion
 from models import PluralsightData 
-from text import is_numbered_list, get_numbered_list_char_count
-import re
 
-# Parse the data in the CSV file into a dictionary 
+
+# Parse the data in the CSV file 
 def parse_pluralsight_csv(file_path):
 	csvfile = open(file_path, 'r')
 	csvreader = csv.reader(csvfile)
@@ -26,6 +24,7 @@ def main():
 	file_path = str(input('Enter full path name to Pluralsight notes (.csv): '))
 	pluralsight_data = parse_pluralsight_csv(file_path)
 	convert_to_notion(pluralsight_data)
+
 
 if __name__ == "__main__":
 	main()

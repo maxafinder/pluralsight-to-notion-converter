@@ -2,13 +2,17 @@ import re
 from typing import List
 from abc import abstractmethod, ABC
 
+
 class ContentType(ABC):
 	@abstractmethod
 	def format_req(self):
 		pass
 
+
 class Text(ContentType):
 	def __init__(self, text: str):
+		if text[0] == '\n':
+			text = text[1:]
 		self.text = text
 
 	def format_req(self):
@@ -22,6 +26,8 @@ class Text(ContentType):
 
 class InlineCode(ContentType):
 	def __init__(self, text: str):
+		if text[0] == '\n':
+			text = text[1:]
 		self.text = text
 
 	def format_req(self):
@@ -56,8 +62,10 @@ class CodeBlock(ContentType):
 
 
 class NumberedList(ContentType):
-	def __init__(self, items):
-		self.items = items
+	def __init__(self, numbered_list: List[str]):
+		self.items: List[ContentType] = []
+		for item_str in numbered_list:
+			self.items.append(parse_text(item_str))
 
 	def format_req(self):
 		numbered_list_notion_api_formatted = []
@@ -65,18 +73,14 @@ class NumberedList(ContentType):
 			numbered_list_notion_api_formatted.append(self.__format_item(item))
 		return numbered_list_notion_api_formatted
 
-	def __format_item(self, item: str):
+	def __format_item(self, item: List[ContentType]):
+		item_notion_api_formatted = []
+		for part in item:
+			item_notion_api_formatted.append(part.format_req())
 		return {
 			'type': 'numbered_list_item',
 			'numbered_list_item': {
-				'rich_text': [
-					{
-						'type': 'text',
-						'text': {
-							'content': item,
-						}
-					}
-				],
+				'rich_text': item_notion_api_formatted
 			}
 		}
 
@@ -111,6 +115,7 @@ def parse_text(text) -> List[ContentType]:
 		parts.append(Text(text_part))
 	return parts		
 
+
 # If the text starts with a code block part, return its content
 def is_code_block(text):
 	pattern = r"^```(.*?)```"
@@ -120,6 +125,7 @@ def is_code_block(text):
 	else:
 		return None
 
+
 # If the text starts with an inline code part, return its content
 def is_inline_code(text):
 	pattern = r"^`(.+?)`"
@@ -128,6 +134,7 @@ def is_inline_code(text):
 		return match.group(1)
 	else:
 		return None
+
 
 # If the text starts with a numbered list part, return its content
 def is_numbered_list(text):
@@ -139,6 +146,7 @@ def is_numbered_list(text):
 	# The first item will have the "1. " prefix, so we remove it.
 	items[0] = items[0][3:]
 	return items
+
 
 # Return the original number of character that were in this numbered list
 def get_numbered_list_char_count(numbered_list):

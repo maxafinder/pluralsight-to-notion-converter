@@ -24,7 +24,8 @@ class Note:
 					next_part.clear()
 				note_notion_api_formatted.extend(part.format_req())
 			else:
-				if (i + 1) < len(self.note) and self.note[i + 1].__class__ == NumberedList:
+				# remove unecessary trailin '\n' if before CodeBlock or NumberedList
+				if (i + 1) < len(self.note) and (self.note[i + 1].__class__ == CodeBlock or self.note[i + 1].__class__ == NumberedList and part.text[-1] == '\n'):
 					part.text = part.text[:-1]
 				next_part.append(part.format_req())
 		if next_part:
