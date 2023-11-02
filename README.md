@@ -1,10 +1,21 @@
 # pluralsight-to-notion-converter
-Allows notes downloaded from Pluralsight to be automatically converted into a completely formatted Notion page.
+Allows notes downloaded from Pluralsight to be automatically converted from a `.csv` file into a completely formatted Notion page.
+## Example
 
-
-
-## Pluralsight notes format
-When you download your notes from Pluralsight, the file format that they are in is `.csv`.
+<table>
+<tr>
+<td>
+	<img src="https://github.com/maxafinder/pluralsight-to-notion-converter/assets/76804820/28a2d3b8-08fe-4d43-961b-eee4de7db6a1" width="100%" align="top"/>
+	<br>
+	Downloaded notes (before)
+</td>
+<td>
+	<img src="https://github.com/maxafinder/pluralsight-to-notion-converter/assets/76804820/02fed8ad-ee00-4ff6-8933-342c452ff3ad" width="100%" />
+    <br>
+    Converted to Notion (After)
+</td>
+</tr>
+</table>
 
 ## Notion integration
 View the [documentation](https://developers.notion.com/docs/create-a-notion-integration) to create an internal Notion Integration. After creating a Notion Integration do the following:
