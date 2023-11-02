@@ -2,7 +2,8 @@ from typing import List
 import csv
 import notion_functions as notion
 from models import PluralsightData 
-from text import parse_text
+from text import is_numbered_list, get_numbered_list_char_count
+import re
 
 # Parse the data in the CSV file into a dictionary 
 def parse_pluralsight_csv(file_path):
@@ -25,14 +26,6 @@ def main():
 	file_path = str(input('Enter full path name to Pluralsight notes (.csv): '))
 	pluralsight_data = parse_pluralsight_csv(file_path)
 	convert_to_notion(pluralsight_data)
-
-my_str = """YAML syntax:
-1. YAML files are composed of Maps and Lists. All of these things can be nested inside each other.
-2. Indentation matters.
-3. Always use spaces instead of tabs.
-4. Maps are `name: value` pairs.
-5. Lists are a sequence of items that use the `-` character.
-"""
 
 if __name__ == "__main__":
 	main()

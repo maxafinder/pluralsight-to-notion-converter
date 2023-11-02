@@ -55,21 +55,30 @@ class CodeBlock(ContentType):
 		}
 
 
-class NumberedListItem:
-	def __init__(self, number, content):
-		self.number = number
-		self.content = content
-
-
 class NumberedList(ContentType):
-	def __init__(self):
-		self.items = []
+	def __init__(self, items):
+		self.items = items
 
-	def add_item(self, item: NumberedListItem):
-		self.items.append(item)
-	
 	def format_req(self):
-		pass
+		numbered_list_notion_api_formatted = []
+		for item in self.items:
+			numbered_list_notion_api_formatted.append(self.__format_item(item))
+		return numbered_list_notion_api_formatted
+
+	def __format_item(self, item: str):
+		return {
+			'type': 'numbered_list_item',
+			'numbered_list_item': {
+				'rich_text': [
+					{
+						'type': 'text',
+						'text': {
+							'content': item,
+						}
+					}
+				],
+			}
+		}
 
 
 def parse_text(text) -> List[ContentType]:
@@ -77,7 +86,13 @@ def parse_text(text) -> List[ContentType]:
 	text_part = ''
 	i = 0
 	while i < len(text):
-		if (code_block_part := is_code_block(text[i:])):
+		if (numbered_list_part := is_numbered_list(text[i:])):
+			if text_part != '':
+				parts.append(Text(text_part))
+				text_part = ''
+			parts.append(NumberedList(numbered_list_part))
+			i += get_numbered_list_char_count(numbered_list_part)
+		elif (code_block_part := is_code_block(text[i:])):
 			if text_part != '':
 				parts.append(Text(text_part))
 				text_part = ''
@@ -114,9 +129,20 @@ def is_inline_code(text):
 	else:
 		return None
 
-def is_numbered_list_start(text, i):
-	return (i + 3) < len(text) and text[i:4] == '\n1. '
+# If the text starts with a numbered list part, return its content
+def is_numbered_list(text):
+	list_match = re.search(r'^(1\..*?)(?=\n(?!\d+\. )|$)', text, re.DOTALL)
+	if not list_match:
+			return []
+	# Split the captured list into items.
+	items = re.split(r'\n\d+\. ', list_match.group(1))
+	# The first item will have the "1. " prefix, so we remove it.
+	items[0] = items[0][3:]
+	return items
 
-# TODO: parse numbered list	
-def parse_numbered_list(text):
-	print()
+# Return the original number of character that were in this numbered list
+def get_numbered_list_char_count(numbered_list):
+	count = 0 
+	for item in numbered_list:
+		count += len(item) + 4 # 3 for num-dot-space and 1 for ending '\n'
+	return count

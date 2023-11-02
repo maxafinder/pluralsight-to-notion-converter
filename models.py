@@ -1,5 +1,5 @@
 from typing import List
-from text import parse_text, CodeBlock 
+from text import parse_text, CodeBlock, NumberedList, ContentType
 import copy
 
 
@@ -7,7 +7,29 @@ class Note:
 	def __init__(self, time, url, text):
 		self.time = time
 		self.url = url
-		self.note = parse_text(text)
+		self.note: List[ContentType] = parse_text(text)
+
+	def get_notion_api_format(self):
+		note_notion_api_formatted = []
+		next_part = []
+		for i, part in enumerate(self.note):
+			if part.__class__ == CodeBlock: 
+				if next_part:
+					note_notion_api_formatted.append(self.__format_text_parts(copy.copy(next_part)))
+					next_part.clear()
+				note_notion_api_formatted.append(part.format_req())
+			elif part.__class__ == NumberedList:
+				if next_part:
+					note_notion_api_formatted.append(self.__format_text_parts(copy.copy(next_part)))
+					next_part.clear()
+				note_notion_api_formatted.extend(part.format_req())
+			else:
+				if (i + 1) < len(self.note) and self.note[i + 1].__class__ == NumberedList:
+					part.text = part.text[:-1]
+				next_part.append(part.format_req())
+		if next_part:
+			note_notion_api_formatted.append(self.__format_text_parts(copy.copy(next_part)))
+		return note_notion_api_formatted
 
 	def __format_text_parts(self, parts_api_formatted):
 		return {
@@ -18,20 +40,6 @@ class Note:
 			}
 		}
 
-	def get_notion_api_format(self):
-		note_notion_api_formatted = []
-		next_part = []
-		for part in self.note:
-			if part.__class__ == CodeBlock:
-				if next_part:
-					note_notion_api_formatted.append(self.__format_text_parts(copy.copy(next_part)))
-					next_part.clear()
-				note_notion_api_formatted.append(part.format_req())
-			else:
-				next_part.append(part.format_req())
-		if next_part:
-			note_notion_api_formatted.append(self.__format_text_parts(copy.copy(next_part)))
-		return note_notion_api_formatted
 
 class Clip:
 	def __init__(self, name):
