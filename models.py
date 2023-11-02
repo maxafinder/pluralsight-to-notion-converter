@@ -119,8 +119,13 @@ class Course:
 
 	def get_notion_api_format(self, notion_page_id):
 		modules_notion_api_formatted = []
-		for module in self.modules:
+		for i, module in enumerate(self.modules):
 			modules_notion_api_formatted.append(module.get_notion_api_format())
+			if i < len(self.modules) - 1:
+				modules_notion_api_formatted.append({
+					"type": "divider",
+					"divider": {}
+				})
 		return {
 			'parent': { 'page_id': notion_page_id },
 			'properties': {
