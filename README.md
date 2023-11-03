@@ -1,3 +1,5 @@
+<img src="https://github.com/maxafinder/pluralsight-to-notion-converter/assets/76804820/a864c92d-3204-4409-a4fe-19cc4121e9bb" width="15%" />
+
 # pluralsight-to-notion-converter
 Allows notes downloaded from Pluralsight to be automatically converted from a `.csv` file into a completely formatted Notion page.
 ## Example
@@ -5,7 +7,7 @@ Allows notes downloaded from Pluralsight to be automatically converted from a `.
 <table>
 <tr>
 <td>
-	<img src="https://github.com/maxafinder/pluralsight-to-notion-converter/assets/76804820/28a2d3b8-08fe-4d43-961b-eee4de7db6a1" width="100%" align="top"/>
+	<img src="https://github.com/maxafinder/pluralsight-to-notion-converter/assets/76804820/28a2d3b8-08fe-4d43-961b-eee4de7db6a1" width="100%" align="top" />
 	<br>
 	Downloaded notes (before)
 </td>
